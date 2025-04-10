@@ -6,7 +6,7 @@ The goal is to build a codeforces's mcp server for users to get codeforces info 
 
 ## 开发者说明
 
-本地测试 mcp-server 用 
+本地测试 mcp-server 用
 
 ```bash
 mcp dev server.py
