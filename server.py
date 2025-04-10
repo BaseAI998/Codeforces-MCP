@@ -22,6 +22,9 @@ async def make_cf_request(url : str) -> dict[str, Any] | str :
         
 @mcp.tool()
 async def get_user_rating(handle : str) -> str :
+    """
+    输入Codeforces用户名, 返回该用户的rating信息
+    """
     url = f"{CF_API_BASE}user.rating?handle={handle}"
     data = await make_cf_request(url)
     if type(data) == str :
@@ -31,7 +34,32 @@ async def get_user_rating(handle : str) -> str :
         return "\n---\n".join(ratings)
     else :
         return "rusult不在data中"
-    return str(data)
+    
+@mcp.tool()
+async def get_user_info(handle : str) -> str :
+    """
+    输入Codeforces用户名, 返回该用户的基本信息
+    """
+    url = f"{CF_API_BASE}user.info?handles={handle}"
+    data = await make_cf_request(url)
+    if type(data) == str :
+        return data        
+    if "result" in data:
+        user = data['result'][0]  # 获取第一个用户的信息
+        info = [
+            # get(查询信息， 默认值)
+            f"Handle: {user['handle']}",
+            f"姓名: {user.get('firstName', '')} {user.get('lastName', '')}",
+            f"当前Rating: {user.get('rating', 'N/A')}",
+            f"最高Rating: {user.get('maxRating', 'N/A')}",
+            f"当前段位: {user.get('rank', 'N/A')}",
+            f"最高段位: {user.get('maxRank', 'N/A')}",
+            f"组织: {user.get('organization', '无')}",
+            f"贡献度: {user.get('contribution', 0)}"
+        ]
+        return "\n---\n".join(info)
+    else :
+        return "rusult不在data中"
 
 if __name__ == "__main__" :
     mcp.run(transport='stdio')
