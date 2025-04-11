@@ -65,7 +65,7 @@ async def get_user_info(handle : str) -> str :
 # blog 待更新
 
 # contest 开发中
-@mcp.tool()
+@mcp.tool() 
 async def get_contest_list(maxn : int = 50, type : str = "None") -> str :
     """
     获取Codeforces可用竞赛的信息
@@ -104,13 +104,6 @@ async def get_contest_list(maxn : int = 50, type : str = "None") -> str :
         return "\n\n---\n\n".join(contests)
 
 # prolemsets 开发中
-    """
-    输入Codeforces用户名, 返回该用户的rating变化信息
-    """
-    url = f"{CF_API_BASE}user.rating?handle={handle}"
-    data = await make_cf_request(url)
-    if type(data) == str :
-        return data # 返回错误信息
 
 if __name__ == "__main__" :
     mcp.run(transport='stdio')
