@@ -84,6 +84,34 @@ async def get_contest_list(maxn : int = 50, contest_type : str = "None") -> str 
             contests.append("\n".join(contest_info))
         return "\n\n---\n\n".join(contests)
 
+@mcp.tool()
+async def get_user_performance_in_contest(handle : str, contest_id : int) -> str :
+    """
+    获取用户在某场比赛中的表现
+    handle : 用户名
+    contest_id : 比赛ID
+    """
+    url = f"{CF_API_BASE}contest.ratingChanges?contestId={contest_id}"
+    data = await make_cf_request(url)
+    
+    if type(data) == str:
+        return data  # 返回错误信息
+    
+    for performance in data["result"]:
+        if performance["handle"].lower() == handle.lower():
+            performance_info = [
+                f"比赛ID: {performance['contestId']}",
+                f"比赛名称: {performance['contestName']}",
+                f"用户名: {performance['handle']}",
+                f"排名: {performance['rank']}",
+                # f"比赛时间: {performance['ratingUpdateTimeSeconds'] }",
+                f"旧Rating: {performance['oldRating']}",
+                f"新Rating: {performance['newRating']}"
+            ]
+            return "\n".join(performance_info)
+    
+    return f"未找到用户 {handle} 在比赛 {contest_id} 中的表现信息。"
+
 # prolemsets 开发中
 
 if __name__ == "__main__" :
