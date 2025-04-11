@@ -15,11 +15,9 @@ async def get_user_rating(handle : str) -> str :
     data = await make_cf_request(url)
     if type(data) == str :
         return data # 返回错误信息
-    if "result" in data:
+    else :
         ratings = [f"rating : {rating['newRating']}" for rating in data['result']]
         return "\n---\n".join(ratings)
-    else :
-        return "rusult不在data中"
     
 @mcp.tool()
 async def get_user_info(handle : str) -> str :
@@ -30,7 +28,7 @@ async def get_user_info(handle : str) -> str :
     data = await make_cf_request(url)
     if type(data) == str :
         return data # 返回错误信息
-    if "result" in data:
+    else :
         user = data['result'][0]  # 获取第一个用户的信息
         info = [
             # get(查询信息， 默认值)
@@ -44,8 +42,6 @@ async def get_user_info(handle : str) -> str :
             f"贡献度: {user.get('contribution', 0)}"
         ]
         return "\n---\n".join(info)
-    else :
-        return "rusult不在data中"
     
 # blog 待更新
 
