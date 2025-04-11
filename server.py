@@ -1,24 +1,9 @@
 from typing import Any
-import httpx
 from mcp.server.fastmcp import FastMCP
+from config import CF_API_BASE
+from cf_request import make_cf_request
 
 mcp = FastMCP("codeforces-MCP")
-
-CF_API_BASE = "https://codeforces.com/api/"
-USER_AGENT = "MCP-Codeforces/1.0 (Python; httpx)"
-
-async def make_cf_request(url : str) -> dict[str, Any] | str :
-    headers = {
-        "User-Agent" : USER_AGENT,
-        "Accept" : "application/json"
-    }
-    async with httpx.AsyncClient() as client :
-        try :
-            response = await client.get(url=url, headers=headers, timeout=30.0)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e :
-            return str(e)
 
 # user    
 @mcp.tool()
@@ -65,20 +50,20 @@ async def get_user_info(handle : str) -> str :
 # blog 待更新
 
 # contest 开发中
-@mcp.tool() 
-async def get_contest_list(maxn : int = 50, type : str = "None") -> str :
+@mcp.tool() # 问题：请求超时(已解决)
+async def get_contest_list(maxn : int = 50, contest_type : str = "None") -> str :
     """
     获取Codeforces可用竞赛的信息
     最近 maxn 场比赛
-    type : "gym" or "contest" or "None"
+    contest_type : "gym" or "contest" or "None"
     """
     maxn = min(maxn, 50)  # 限制最大值为50
     
     # url 分类
     url = f"{CF_API_BASE}contest.list"
-    if "gym" in type.lower() :
+    if "gym" in contest_type.lower() :
         url += "?gym=true"
-    elif "contest" in type.lower() :
+    elif "contest" in contest_type.lower() :
         url += "?contest=true"
     
     data = await make_cf_request(url)
@@ -86,8 +71,8 @@ async def get_contest_list(maxn : int = 50, type : str = "None") -> str :
         return data # 返回错误信息
     else :
         contests = []
-        # 只获取前 maxn 场比赛
-        for contest in data["result"][:maxn] :
+        # 只获取后 maxn 场比赛
+        for contest in data["result"][-maxn:] :
             contest_info = [
                 f"比赛ID: {contest['id']}",
                 f"比赛名称: {contest['name']}",
